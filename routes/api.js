@@ -111,10 +111,11 @@ router.post('/donation', function (req, res, next) {
 		const giver = req.query.giver
 		const fundraiserId = req.query.fundraiserId
 
-		console.log(date, amount, giver, fundraiserId);//测试拿到参数
+		// console.log(date, amount, giver, fundraiserId);//测试拿到参数
+
 		if (!date || !amount || !giver || !fundraiserId) {
             // 如果数据不完整，返回400错误
-            return res.status(400).send('缺少必要的捐赠字段');
+            return res.status(400).send('missing required arguments.');
         }
 		// 准备插入数据库的SQL语句
 		const query = 'INSERT INTO DONATION (DATE, AMOUNT, GIVER, FUNDRAISER_ID) VALUES (?, ?, ?, ?)';
@@ -135,14 +136,21 @@ router.post('/add_fundraiser', function (req, res, next) {
 		if (err) {
 			res.send('Connection error')
 		}
-		const date = req.query.date
-		const amount = req.query.amount
-		const giver = req.query.giver
+		
+		const organizer = req.query.organizer
+		const caption = req.query.caption
+		const targetFunding = req.query.target_funding
+		const currentFunding = req.query.current_funding
+		const city = req.query.city
+		const active = req.query.active
+		const categoryID = req.query.category_id
 
 		console.log(date, amount, giver, fundraiserId);//测试拿到参数
-		if (!date || !amount || !giver || !fundraiserId) {
+		if (!organizer || !caption || !targetFunding || !currentFunding 
+			||!city || active || categoryID
+		) {
             // 如果数据不完整，返回400错误
-            return res.status(400).send('缺少必要的捐赠字段');
+            return res.status(400).send('missing required arguments.');
         }
 		// 准备插入数据库的SQL语句
 		const query = 'INSERT INTO DONATION (DATE, AMOUNT, GIVER, FUNDRAISER_ID) VALUES (?, ?, ?, ?)';

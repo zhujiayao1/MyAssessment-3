@@ -224,9 +224,40 @@ router.put('/fundraiser/:id', function (req, res) {
 	})
 })
 
+router.delete('/fundraiser/:id', function (req, res) {
+	pool.getConnection(function(err,connection){
+		if (err) {
+			res.send('Connection error')
+		}
+		const fundraiserId = req.params.id;
+		console.log(fundraiserId);
+		const query = 'SELECT COUNT(*) AS donationCount FROM DONATION WHERE FUNDRAISER_ID = ?';
+		const result = connection.query(query, [fundraiserId]);
+		console.log(result.results);
+		if (result.donationCount > 0) {
+			// 如果已有捐款，返回错误信息
+			return res.status(400).json({ message: '不能删除已获得捐款的筹款人' });
+		}
+
+		// 如果没有捐款，执行删除操作
+		const deleteQuery = 'DELETE FROM FUNDRAISER WHERE ID = ?';
+		const deleteResult = connection.query(deleteQuery, [fundraiserId]);
+
+		if (deleteResult.affectedRows === 0) {
+			// 如果没有记录被删除，说明筹款人不存在
+			return res.status(404).json({ message: '未找到ID对应的筹款人' });
+		}
+
+		if (err) {
+			console.log(err)
+			res.send('Query failure')
+		}
+		// 删除成功
+		res.send("fundraiser delete success")
+		connection.release();
+	})
+})
 
 ;
-
-
 
 module.exports = router;

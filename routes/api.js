@@ -10,7 +10,7 @@ router.use(express.json()); // 用于解析JSON格式的请求体
 // 使用中间件解析URL编码的请求体
 router.use(express.urlencoded({ extended: true }));
 
-router.get('/indexbox',function(req,res,next){
+router.get('/indexbox',function(req,res){
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
@@ -34,7 +34,7 @@ router.get('/indexbox',function(req,res,next){
 })
 
 
-router.get('/Search',function(req,res,next){
+router.get('/Search',function(req,res){
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
@@ -77,7 +77,7 @@ router.get('/Search',function(req,res,next){
 })
 
 
-router.get('/queryById', function (req, res, next) {
+router.get('/queryById', function (req, res) {
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
@@ -101,7 +101,7 @@ router.get('/queryById', function (req, res, next) {
 	})
 })
 
-router.post('/donation', function (req, res, next) {
+router.post('/donation', function (req, res) {
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
@@ -131,7 +131,7 @@ router.post('/donation', function (req, res, next) {
 	})
 })
 
-router.post('/add_fundraiser', function (req, res, next) {
+router.post('/add_fundraiser', function (req, res) {
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
@@ -177,7 +177,7 @@ router.post('/add_fundraiser', function (req, res, next) {
 
 
 
-router.put('/api/fundraiser/:id', function (req, res, next) {
+router.put('/fundraiser/:id', function (req, res) {
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
@@ -191,30 +191,34 @@ router.put('/api/fundraiser/:id', function (req, res, next) {
 		const active = req.query.active
 		const categoryID = req.query.category_id
 
-		console.log(targetFunding,currentFunding);//测试拿到参数
+		console.log(fundraiserId+"\n",req.query);//测试拿到参数
 		if (!organizer || !caption || !targetFunding || !currentFunding 
 			|| !city || !active || !categoryID
 		) {
             // 如果数据不完整，返回400错误
-            return res.status(400).send('missing required arguments.');
+            return res.status(400).send(
+				organizer+'  '+caption+'  '+targetFunding+'  '+currentFunding
+				+'  '+city+'  '+active+'  '+categoryID+'  '
+				+'missing required arguments.');
         }
 		// 准备插入数据库的SQL语句
 		const query = `
-		UPDATE fundraiser SET ORGANIZER = ?,
-        CAPTION = ?,
-        TARGET_FUNDING = ?,
-        CURRENT_FUNDING = ?,
-        CITY = ?,
-        ACTIVE = ?,
-        CATEGORY_ID = ?
-		WHERE ID = ?
+		UPDATE fundraiser 
+		SET ORGANIZER = ?,
+			CAPTION = ?,
+			TARGET_FUNDING = ?,
+			CURRENT_FUNDING = ?,
+			CITY = ?,
+			ACTIVE = ?,
+			CATEGORY_ID = ?
+		WHERE FUNDRAISER_ID = ?
 		`;
 		connection.query(query, [organizer, caption, targetFunding, currentFunding, city, active, categoryID, fundraiserId],function(err,rows){
 			if (err) {
 				console.log(err)
 				res.send('Query failure')
 			}
-			res.send("fundraiser insert success")
+			res.send("fundraiser update success")
 			connection.release();
 		})
 	})

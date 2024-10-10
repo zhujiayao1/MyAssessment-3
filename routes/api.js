@@ -177,6 +177,48 @@ router.post('/add_fundraiser', function (req, res, next) {
 
 
 
+router.put('/api/fundraiser/:id', function (req, res, next) {
+	pool.getConnection(function(err,connection){
+		if (err) {
+			res.send('Connection error')
+		}
+		const fundraiserId = req.params.id; // 从请求参数中获取筹款人的 ID
+		const organizer = req.query.organizer
+		const caption = req.query.caption
+		const targetFunding = req.query.target_funding
+		const currentFunding = req.query.current_funding
+		const city = req.query.city
+		const active = req.query.active
+		const categoryID = req.query.category_id
+
+		console.log(targetFunding,currentFunding);//测试拿到参数
+		if (!organizer || !caption || !targetFunding || !currentFunding 
+			|| !city || !active || !categoryID
+		) {
+            // 如果数据不完整，返回400错误
+            return res.status(400).send('missing required arguments.');
+        }
+		// 准备插入数据库的SQL语句
+		const query = `
+		UPDATE fundraiser SET ORGANIZER = ?,
+        CAPTION = ?,
+        TARGET_FUNDING = ?,
+        CURRENT_FUNDING = ?,
+        CITY = ?,
+        ACTIVE = ?,
+        CATEGORY_ID = ?
+		WHERE ID = ?
+		`;
+		connection.query(query, [organizer, caption, targetFunding, currentFunding, city, active, categoryID, fundraiserId],function(err,rows){
+			if (err) {
+				console.log(err)
+				res.send('Query failure')
+			}
+			res.send("fundraiser insert success")
+			connection.release();
+		})
+	})
+})
 
 
 ;

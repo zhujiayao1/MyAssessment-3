@@ -136,7 +136,6 @@ router.post('/add_fundraiser', function (req, res, next) {
 		if (err) {
 			res.send('Connection error')
 		}
-		
 		const organizer = req.query.organizer
 		const caption = req.query.caption
 		const targetFunding = req.query.target_funding
@@ -145,26 +144,38 @@ router.post('/add_fundraiser', function (req, res, next) {
 		const active = req.query.active
 		const categoryID = req.query.category_id
 
-		console.log(date, amount, giver, fundraiserId);//测试拿到参数
+		console.log(targetFunding,currentFunding);//测试拿到参数
 		if (!organizer || !caption || !targetFunding || !currentFunding 
-			||!city || active || categoryID
+			|| !city || !active || !categoryID
 		) {
             // 如果数据不完整，返回400错误
             return res.status(400).send('missing required arguments.');
         }
 		// 准备插入数据库的SQL语句
-		const query = 'INSERT INTO DONATION (DATE, AMOUNT, GIVER, FUNDRAISER_ID) VALUES (?, ?, ?, ?)';
+		const query = `
+		INSERT INTO fundraiser (
+		ORGANIZER, 
+		CAPTION, 
+		TARGET_FUNDING, 
+		CURRENT_FUNDING, 
+		CITY, 
+		ACTIVE, 
+		CATEGORY_ID
+		) VALUES (?, ?, ?, ?, ?, ?, ?)
+ 		`;
 
-		connection.query(query, [date, amount, giver, fundraiserId],function(err,rows){
+		connection.query(query, [organizer, caption, targetFunding, currentFunding, city, active, categoryID],function(err,rows){
 			if (err) {
 				console.log(err)
 				res.send('Query failure')
 			}
-			res.send("donation insert success")
+			res.send("fundraiser insert success")
 			connection.release();
 		})
 	})
 })
+
+
 
 
 

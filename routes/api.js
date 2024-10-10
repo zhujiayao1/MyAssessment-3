@@ -130,6 +130,33 @@ router.post('/donation', function (req, res, next) {
 	})
 })
 
+router.post('/add_fundraiser', function (req, res, next) {
+	pool.getConnection(function(err,connection){
+		if (err) {
+			res.send('Connection error')
+		}
+		const date = req.query.date
+		const amount = req.query.amount
+		const giver = req.query.giver
+
+		console.log(date, amount, giver, fundraiserId);//测试拿到参数
+		if (!date || !amount || !giver || !fundraiserId) {
+            // 如果数据不完整，返回400错误
+            return res.status(400).send('缺少必要的捐赠字段');
+        }
+		// 准备插入数据库的SQL语句
+		const query = 'INSERT INTO DONATION (DATE, AMOUNT, GIVER, FUNDRAISER_ID) VALUES (?, ?, ?, ?)';
+
+		connection.query(query, [date, amount, giver, fundraiserId],function(err,rows){
+			if (err) {
+				console.log(err)
+				res.send('Query failure')
+			}
+			res.send("donation insert success")
+			connection.release();
+		})
+	})
+})
 
 
 

@@ -1,8 +1,4 @@
-/*
- * @Descripttion: A3-ionic
- * @Author: Zhujiayao & Chengshuhan
- */
-// This is the configuration file for the database
+
 module.exports = {
 	// Host Name Host name of the computer where the database is located
 	host:'localhost',

@@ -2,27 +2,51 @@
  * @Descripttion: Web-A3
  * @Author: Zhujiayao & Luchenchen
  */
-var express = require('express');
-var router = express.Router();
-var pool    = require('../db/crowdfunding_db');
+const express = require('express');
+const mysql = require('mysql');
+const port = 3000;
+const app = express();
 
-router.use(express.json()); // 用于解析JSON格式的请求体
+
+// Create a database connection pool.
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: 'root',
+  database: 'crowdfunding_db',
+  connectionLimit : 20,
+  waitForConnections: false
+});
+
+// Establish a database connection.
+pool.getConnection(err => {
+  if (err) throw err;
+  console.log('Connected to the database.');
+});
+
+// To start an Express server
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+
+
+app.use(express.json()); // 用于解析JSON格式的请求体
 // 使用中间件解析URL编码的请求体
-router.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
-router.get('/indexbox',function(req,res){
+app.get('/fundraisers',function(req,res){
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
 		}
 		console.log(connection)
-		const query1 = `
+		const query = `
 		SELECT f.*, c.NAME AS category_name
 	   FROM fundraiser f
 	   JOIN category c ON f.CATEGORY_ID = c.CATEGORY_ID
 	   WHERE f.ACTIVE = 1
    `;
-		connection.query(query1,function(err,rows){
+		connection.query(query,function(err,rows){
 			if (err) {
 				console.log(err)
 				res.send('Query failure')
@@ -34,7 +58,7 @@ router.get('/indexbox',function(req,res){
 })
 
 
-router.get('/Search',function(req,res){
+app.get('/Search',function(req,res){
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
@@ -77,7 +101,7 @@ router.get('/Search',function(req,res){
 })
 
 
-router.get('/queryById', function (req, res) {
+app.get('/queryById', function (req, res) {
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
@@ -101,7 +125,7 @@ router.get('/queryById', function (req, res) {
 	})
 })
 
-router.post('/donation', function (req, res) {
+app.post('/donation', function (req, res) {
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
@@ -125,14 +149,13 @@ router.post('/donation', function (req, res) {
 				console.log(err)
 				res.send('Query failure')
 			}
-
 			res.send("donation insert success")
 			connection.release();
 		})
 	})
 })
 
-router.post('/add_fundraiser', function (req, res) {
+app.post('/add_fundraiser', function (req, res) {
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
@@ -145,7 +168,7 @@ router.post('/add_fundraiser', function (req, res) {
 		const active = req.query.active
 		const categoryID = req.query.category_id
 
-		console.log(targetFunding,currentFunding);
+		console.log(targetFunding,currentFunding);//测试拿到参数
 		if (!organizer || !caption || !targetFunding || !currentFunding 
 			|| !city || !active || !categoryID
 		) {
@@ -178,7 +201,7 @@ router.post('/add_fundraiser', function (req, res) {
 
 
 
-router.put('/fundraiser/:id', function (req, res) {
+app.put('/fundraiser/:id', function (req, res) {
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
@@ -225,7 +248,7 @@ router.put('/fundraiser/:id', function (req, res) {
 	})
 })
 
-router.delete('/fundraiser/:id', function (req, res) {
+app.delete('/fundraiser/:id', function (req, res) {
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
@@ -262,4 +285,20 @@ router.delete('/fundraiser/:id', function (req, res) {
 
 ;
 
-module.exports = router;
+
+// Err exec
+app.use((err, req, res, next) => {
+	console.error(err.stack);
+	res.status(500).send('ERR!');
+  });
+  
+  // Close db
+//   process.on('SIGINT', () => {
+// 	connection.end(err => {
+// 	  if (err) console.error('Error closing the connection:', err.stack);
+// 	  console.log('Closed the database connection.');
+// 	  process.exit();
+// 	});
+//   });
+  
+// module.exports = router;

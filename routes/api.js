@@ -125,6 +125,7 @@ router.post('/donation', function (req, res) {
 				console.log(err)
 				res.send('Query failure')
 			}
+
 			res.send("donation insert success")
 			connection.release();
 		})
@@ -144,7 +145,7 @@ router.post('/add_fundraiser', function (req, res) {
 		const active = req.query.active
 		const categoryID = req.query.category_id
 
-		console.log(targetFunding,currentFunding);//测试拿到参数
+		console.log(targetFunding,currentFunding);
 		if (!organizer || !caption || !targetFunding || !currentFunding 
 			|| !city || !active || !categoryID
 		) {

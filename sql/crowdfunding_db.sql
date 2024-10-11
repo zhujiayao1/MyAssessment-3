@@ -11,7 +11,7 @@
  Target Server Version : 80032 (8.0.32)
  File Encoding         : 65001
 
- Date: 10/10/2024 15:26:48
+ Date: 11/10/2024 22:31:07
 */
 
 SET NAMES utf8mb4;
@@ -49,7 +49,7 @@ CREATE TABLE `donation`  (
   PRIMARY KEY (`DONATION_ID`) USING BTREE,
   INDEX `FUNDRAISER_ID`(`FUNDRAISER_ID` ASC) USING BTREE,
   CONSTRAINT `donation_ibfk_1` FOREIGN KEY (`FUNDRAISER_ID`) REFERENCES `fundraiser` (`FUNDRAISER_ID`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of donation
@@ -65,6 +65,8 @@ INSERT INTO `donation` VALUES (8, '2024-10-08 15:21:34', 1000.00, 'gg', 6);
 INSERT INTO `donation` VALUES (9, '2024-10-08 15:21:34', 1000.00, 'HH', 8);
 INSERT INTO `donation` VALUES (10, '2024-10-08 15:21:34', 1000.00, 'II', 9);
 INSERT INTO `donation` VALUES (11, '2024-10-08 15:21:34', 1000.00, 'jj', 10);
+INSERT INTO `donation` VALUES (12, '2024-10-08 00:00:00', 100.00, 'test_post', 2);
+INSERT INTO `donation` VALUES (13, '2024-10-08 00:00:00', 100.00, 'test_post', 2);
 
 -- ----------------------------
 -- Table structure for fundraiser
@@ -82,7 +84,7 @@ CREATE TABLE `fundraiser`  (
   PRIMARY KEY (`FUNDRAISER_ID`) USING BTREE,
   INDEX `CATEGORY_ID`(`CATEGORY_ID` ASC) USING BTREE,
   CONSTRAINT `fundraiser_ibfk_1` FOREIGN KEY (`CATEGORY_ID`) REFERENCES `category` (`CATEGORY_ID`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of fundraiser
@@ -96,6 +98,10 @@ INSERT INTO `fundraiser` VALUES (6, 'Jackson', 'Help The Jackson\'s Rebuild Afte
 INSERT INTO `fundraiser` VALUES (7, 'Aya Hodroj', ' Support for Homeless Animals', 20000.00, 4657.00, 'Lebanon', 1, 8);
 INSERT INTO `fundraiser` VALUES (8, 'Jackson', 'test the same name\'s test', 1000.00, 735.00, ' Byron Bay', 1, 8);
 INSERT INTO `fundraiser` VALUES (9, 'Test the same city', 'Test the same city', 2222.00, 1111.00, 'Denver', 1, 8);
-INSERT INTO `fundraiser` VALUES (10, 'Test the same city', 'Test the same city', 2222.00, 1111.00, 'Denver', 1, 8);
+INSERT INTO `fundraiser` VALUES (10, 'test_post2', 'test_post', 11111.00, 222.00, 'test', 0, 1);
+INSERT INTO `fundraiser` VALUES (11, 'test_post', 'test_post', NULL, NULL, 'test_post', 0, NULL);
+INSERT INTO `fundraiser` VALUES (12, 'test_post1', 'test_post', NULL, NULL, 'test_post', 0, NULL);
+INSERT INTO `fundraiser` VALUES (13, 'test_post1', 'test_post', NULL, NULL, 'test_post', 0, NULL);
+INSERT INTO `fundraiser` VALUES (14, 'test_post1', 'test_post', 11111.00, 222.00, 'test_post', 0, NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;

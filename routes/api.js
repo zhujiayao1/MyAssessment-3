@@ -239,8 +239,10 @@ router.delete('/fundraiser/:id', function (req, res) {
 				res.send('Query failure')
 			}
 			if(rows.donationCount>0){
+				// 如果已有捐款，返回错误信息
 				return res.status(400).json({ message: '不能删除已获得捐款的筹款人' });
 			}
+			// 如果没有捐款，执行删除操作
 			const deleteQuery = 'DELETE FROM FUNDRAISER WHERE FUNDRAISER_ID = ?';
 			connection.query(deleteQuery, [fundraiserId], function(err,rows){
 				if (err) {
@@ -252,24 +254,7 @@ router.delete('/fundraiser/:id', function (req, res) {
 				connection.release();
 			})
 
-		});
-
-		// console.log(result.results);
-		// if (result.donationCount > 0) {
-		// 	// 如果已有捐款，返回错误信息
-		// 	return res.status(400).json({ message: '不能删除已获得捐款的筹款人' });
-		// }
-
-		// // 如果没有捐款，执行删除操作
-		// const deleteQuery = 'DELETE FROM FUNDRAISER WHERE ID = ?';
-		// const deleteResult = connection.query(deleteQuery, [fundraiserId]);
-
-		// if (deleteResult.affectedRows === 0) {
-		// 	// 如果没有记录被删除，说明筹款人不存在
-		// 	return res.status(404).json({ message: '未找到ID对应的筹款人' });
-		// }
-
-		
+		});	
 		
 	})
 })

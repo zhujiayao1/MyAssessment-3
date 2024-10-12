@@ -69,7 +69,7 @@ app.get('/search',function(req,res){
 		}
 		const organizer = req.query.organizer;
 		const city = req.query.city;
-		const categoryName = req.query.category
+		const categoryName = req.query.category;
 		let query = `
 		  SELECT *,name as CATEGORY_NAME 
 		  FROM fundraiser f 

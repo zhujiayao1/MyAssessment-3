@@ -6,14 +6,18 @@ const express = require('express');
 const mysql = require('mysql');
 const port = 3000;
 const app = express();
+const cors = require('cors');//处理跨域请求
 
+// 允许所有跨域请求
+app.use(cors());
 
 // Create a database connection pool.
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
-  password: 'root',
+  password: '123456',
   database: 'crowdfunding_db',
+  port:'3307',
   connectionLimit : 20,
   waitForConnections: false
 });
@@ -46,57 +50,97 @@ app.get('/fundraisers',function(req,res){
 	   JOIN category c ON f.CATEGORY_ID = c.CATEGORY_ID
 	   WHERE f.ACTIVE = 1
    `;
-		connection.query(query,function(err,rows){
+		connection.query(query,function(err,results){
 			if (err) {
 				console.log(err)
 				res.send('Query failure')
 			}
-			res.send(rows)
+			res.send(results)
 			connection.release();
 		})
 	})
 })
 
 
-app.get('/Search',function(req,res){
+app.get('/search',function(req,res){
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
 		}
-		// SELECT f.FUNDRAISER_ID, f.ORGANIZER, f.CAPTION, f.TARGET_FUNDING, f.CURRENT_FUNDING, f.CITY,f.CONTENT
+		const organizer = req.query.organizer;
+		const city = req.query.city;
+		const categoryName = req.query.category
 		let query = `
-		SELECT *
-		FROM FUNDRAISER f
-		LEFT JOIN CATEGORY c ON f.CATEGORY_ID = c.CATEGORY_ID
-		WHERE 1=1
-	`;
-		var categoryName = req.query.category
-		var organizer = req.query.organizer
-		var city = req.query.city
-		const params = [];
-	    console.log(categoryName,organizer,city)
-		if (categoryName) {
-			query += ' AND c.NAME = ?';
-			params.push(categoryName);
-		}
-	
+		  SELECT *,name as CATEGORY_NAME 
+		  FROM fundraiser f 
+		  LEFT JOIN category c 
+		  ON f.CATEGORY_ID = c.CATEGORY_ID
+		  WHERE 
+		`;
+
+		console.log(organizer,city,categoryName)
+		
+		let conditions = [];
+		let params = [];
+	  
 		if (organizer) {
-			query += ' AND f.ORGANIZER LIKE ?';
-			params.push(`%${organizer}%`);
+		  conditions.push('organizer LIKE ?');
+		  params.push(`%${organizer}%`);
 		}
-	
 		if (city) {
-			query += ' AND f.CITY = ?';
-			params.push(city);
+		  conditions.push('city LIKE ?');
+		  params.push(`%${city}%`);
 		}
-		connection.query(query,params,function(err,rows){
-			if (err) {
+		if (categoryName) {
+		  conditions.push('name = ?');
+		  params.push(categoryName);
+		}
+	  
+		query += conditions.join(' AND ');
+		query+=' '
+	  
+		connection.query(query, params, (err, results) => {
+		  	if (err) {
 				console.log(err)
 				res.send('Query failure')
 			}
-			res.send(rows)
+			res.send(results)
 			connection.release();
-		})
+		});
+
+	// 	let query = `
+	// 	SELECT *
+	// 	FROM FUNDRAISER f
+	// 	LEFT JOIN CATEGORY c ON f.CATEGORY_ID = c.CATEGORY_ID
+	// 	WHERE 1=1
+	// `;
+	// 	var categoryName = req.query.category
+	// 	var organizer = req.query.organizer
+	// 	var city = req.query.city
+	// 	const params = [];
+	//     console.log(categoryName,organizer,city)
+	// 	if (categoryName) {
+	// 		query += ' AND c.NAME = ?';
+	// 		params.push(categoryName);
+	// 	}
+	
+	// 	if (organizer) {
+	// 		query += ' AND f.ORGANIZER LIKE ?';
+	// 		params.push(`%${organizer}%`);
+	// 	}
+	
+	// 	if (city) {
+	// 		query += ' AND f.CITY = ?';
+	// 		params.push(city);
+	// 	}
+	// 	connection.query(query,params,function(err,rows){
+	// 		if (err) {
+	// 			console.log(err)
+	// 			res.send('Query failure')
+	// 		}
+	// 		res.send(rows)
+	// 		connection.release();
+	// 	})
 	})
 })
 
@@ -114,12 +158,12 @@ app.get('/queryById', function (req, res) {
 		JOIN category c ON f.CATEGORY_ID = c.CATEGORY_ID
 		WHERE f.ACTIVE = 1 and f.FUNDRAISER_ID = ?
 		`;
-		connection.query(query, [fundraiserId],function(err,rows){
+		connection.query(query, [fundraiserId],function(err,results){
 			if (err) {
 				console.log(err)
 				res.send('Query failure')
 			}
-			res.send(rows[0])
+			res.send(results[0])
 			connection.release();
 		})
 	})
@@ -144,7 +188,7 @@ app.post('/donation', function (req, res) {
 		// 准备插入数据库的SQL语句
 		const query = 'INSERT INTO DONATION (DATE, AMOUNT, GIVER, FUNDRAISER_ID) VALUES (?, ?, ?, ?)';
 
-		connection.query(query, [date, amount, giver, fundraiserId],function(err,rows){
+		connection.query(query, [date, amount, giver, fundraiserId],function(err,results){
 			if (err) {
 				console.log(err)
 				res.send('Query failure')
@@ -188,7 +232,7 @@ app.post('/add_fundraiser', function (req, res) {
 		) VALUES (?, ?, ?, ?, ?, ?, ?)
  		`;
 
-		connection.query(query, [organizer, caption, targetFunding, currentFunding, city, active, categoryID],function(err,rows){
+		connection.query(query, [organizer, caption, targetFunding, currentFunding, city, active, categoryID],function(err,results){
 			if (err) {
 				console.log(err)
 				res.send('Query failure')
@@ -237,7 +281,7 @@ app.put('/fundraiser/:id', function (req, res) {
 			CATEGORY_ID = ?
 		WHERE FUNDRAISER_ID = ?
 		`;
-		connection.query(query, [organizer, caption, targetFunding, currentFunding, city, active, categoryID, fundraiserId],function(err,rows){
+		connection.query(query, [organizer, caption, targetFunding, currentFunding, city, active, categoryID, fundraiserId],function(err,results){
 			if (err) {
 				console.log(err)
 				res.send('Query failure')
@@ -257,18 +301,18 @@ app.delete('/fundraiser/:id', function (req, res) {
 		console.log(fundraiserId);
 		const query = 'SELECT COUNT(*) AS donationCount FROM DONATION WHERE FUNDRAISER_ID = ?';
 		// const result = connection.query(query, [fundraiserId])
-		connection.query(query, [fundraiserId],function(err,rows){
+		connection.query(query, [fundraiserId],function(err,results){
 			if (err) {
 				console.log(err)
 				res.send('Query failure')
 			}
-			if(rows.donationCount>0){
+			if(results.donationCount>0){
 				// 如果已有捐款，返回错误信息
 				return res.status(400).json({ message: '不能删除已获得捐款的筹款人' });
 			}
 			// 如果没有捐款，执行删除操作
 			const deleteQuery = 'DELETE FROM FUNDRAISER WHERE FUNDRAISER_ID = ?';
-			connection.query(deleteQuery, [fundraiserId], function(err,rows){
+			connection.query(deleteQuery, [fundraiserId], function(err,results){
 				if (err) {
 					console.log(err)
 					res.send('Query failure')

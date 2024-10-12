@@ -15,9 +15,9 @@ app.use(cors());
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
-  password: '123456',
+  password: 'root',
   database: 'crowdfunding_db',
-  port:'3307',
+  port:'3306',
   connectionLimit : 20,
   waitForConnections: false
 });

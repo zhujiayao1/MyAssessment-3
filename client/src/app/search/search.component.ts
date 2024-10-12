@@ -1,3 +1,7 @@
+/*
+ * @Descripttion: Web-A3
+ * @Author: Zhujiayao & Luchenchen
+ */
 import { Component } from '@angular/core';
 import { DataService } from '../services/data.service';
 
@@ -16,7 +20,7 @@ export class SearchComponent {
   };
   fundraisers: any[] = [];
   error: boolean = false;
-  categories: string[] = ['Education', 'Health', 'Environment', 'Animal Welfare']; // 示例类别
+  categories: string[] = ['Medical', 'Education', 'Crisis Relief', 'Animal','Social Impact' ]; // 类别字典
 
   // 构造函数中注入DataService
   constructor(private dataService: DataService) { }

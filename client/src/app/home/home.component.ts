@@ -7,8 +7,7 @@ import { DataService } from '../services/data.service';
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  welcomeMessage: string = "Welcome to Our Funny Funding!";
-  inspiringStories: string = "Your support fuels our journey forward.";
+  
   contactInfo: string = "Contact us: info@nonprofit.org";
  
   data:any;

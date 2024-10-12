@@ -107,50 +107,16 @@ app.get('/search',function(req,res){
 			res.send(results)
 			connection.release();
 		});
-
-	// 	let query = `
-	// 	SELECT *
-	// 	FROM FUNDRAISER f
-	// 	LEFT JOIN CATEGORY c ON f.CATEGORY_ID = c.CATEGORY_ID
-	// 	WHERE 1=1
-	// `;
-	// 	var categoryName = req.query.category
-	// 	var organizer = req.query.organizer
-	// 	var city = req.query.city
-	// 	const params = [];
-	//     console.log(categoryName,organizer,city)
-	// 	if (categoryName) {
-	// 		query += ' AND c.NAME = ?';
-	// 		params.push(categoryName);
-	// 	}
-	
-	// 	if (organizer) {
-	// 		query += ' AND f.ORGANIZER LIKE ?';
-	// 		params.push(`%${organizer}%`);
-	// 	}
-	
-	// 	if (city) {
-	// 		query += ' AND f.CITY = ?';
-	// 		params.push(city);
-	// 	}
-	// 	connection.query(query,params,function(err,rows){
-	// 		if (err) {
-	// 			console.log(err)
-	// 			res.send('Query failure')
-	// 		}
-	// 		res.send(rows)
-	// 		connection.release();
-	// 	})
 	})
 })
 
 
-app.get('/queryById', function (req, res) {
+app.get('/fundraiser/:id', function (req, res) {
 	pool.getConnection(function(err,connection){
 		if (err) {
 			res.send('Connection error')
 		}
-		const fundraiserId = req.query.id;
+		const fundraiserId = req.params.id;
 		console.log(fundraiserId);
 		const query = `
 			 SELECT f.*, c.NAME AS category_name
@@ -179,7 +145,7 @@ app.post('/donation', function (req, res) {
 		const giver = req.query.giver
 		const fundraiserId = req.query.fundraiserId
 
-		// console.log(date, amount, giver, fundraiserId);//测试拿到参数
+		console.log(date, amount, giver, fundraiserId);//测试拿到的参数
 
 		if (!date || !amount || !giver || !fundraiserId) {
             // 如果数据不完整，返回400错误

@@ -1,1 +1,42 @@
-<p>admin works!</p>
+
+<div class="container">
+
+    <h1>Admin Dashboard  <button (click)="openaAddDialog()">add fundraiser</button></h1>
+   
+    <!-- 筹款人列表 -->
+    <div class="fundraisers-list">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Organizer</th>
+                    <th>Caption</th>
+                    <th>Target Funding</th>
+                    <th>Current Funding</th>
+                    <th>City</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let fundraiser of fundraisers">
+                    <td>{{ fundraiser.ORGANIZER }}</td>
+                    <td>{{ fundraiser.CAPTION }}</td>
+                    <td>{{ fundraiser.TARGET_FUNDING | currency: 'AUD' }}</td>
+                    <td>{{ fundraiser.CURRENT_FUNDING | currency: 'AUD' }}</td>
+                    <td>{{ fundraiser.CITY }}</td>
+                    <td>{{ fundraiser.category_name }}</td>
+                    <td *ngIf="fundraiser.ACTIVE === 1"> Active </td>
+                    <td *ngIf="fundraiser.ACTIVE === 0" style="color:red"> Inactive </td>
+                    <td>
+                        <button (click)="openUpdateDialog(fundraiser)">Update</button>
+                        <button (click)="deleteFundraiser(fundraiser)">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+   
+
+</div>

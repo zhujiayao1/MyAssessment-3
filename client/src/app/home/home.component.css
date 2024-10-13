@@ -1,3 +1,16 @@
+/* app.component.css */
+nav ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  nav ul li {
+    display: inline;
+    margin-right: 10px;
+  }
+  
+
+/* 全局样式 */
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
@@ -5,6 +18,42 @@ body {
     background-color: #f4f4f4;
   }
   
+  /* 导航栏样式 */
+  nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+  }
+  
+  nav ul li {
+    float: left;
+  }
+  
+  nav ul li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+  
+  nav ul li a:hover {
+    background-color: #111;
+  }
+  
+  /* 头部样式 */
+  header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+  }
+  
+  header h1 {
+    margin: 0;
+  }
 
     h2 {
     text-align: center; /* 将标题居中 */

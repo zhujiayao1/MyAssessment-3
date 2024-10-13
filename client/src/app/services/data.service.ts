@@ -1,7 +1,3 @@
-/*
- * @Descripttion: Web-A3
- * @Author: Zhujiayao & Luchenchen
- */
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -14,15 +10,20 @@ export class DataService {
 
   constructor(private http: HttpClient) { }
 
-
-  getData(): Observable<any> {
-    // GET方法发送请求
+  //get active fundraisers
+  getFundraisers(): Observable<any> {
     return this.http.get('http://localhost:3000/fundraisers');
   }
 
+  //get all fundraisers
+  getAllFundraisers(): Observable<any> {
+    return this.http.get('http://localhost:3000/all_fundraisers');
+  }
+
+
+  //search fundraisers
   searchFundraisers(criteria: any): Observable<any[]> {
     const params = this.serializeCriteria(criteria);
-    console.log(params)
     // 反引号构建url
     return this.http.get<any[]>(`http://localhost:3000/search?${params}`);
   }
@@ -33,11 +34,12 @@ export class DataService {
     if (criteria.organizer) params.append('organizer', criteria.organizer);
     if (criteria.city) params.append('city', criteria.city);
     console.log(criteria.selectedCategory);
-    if (criteria.selectedCategory) params.append('categories', criteria.selectedCategory); 
+    if (criteria.selectedCategory) params.append('category', criteria.selectedCategory); 
  
     return params.toString();
   }
 
+  //getFundraiser by fid
   getFundraiser(fundraiserId: string): Observable<any> {
     console.log("data service fid:",fundraiserId);
     // 替换为实际的API端点
@@ -45,4 +47,26 @@ export class DataService {
   }
 
 
+  postDonation(donation: any): Observable<any>{
+    // format datetime for MySQL
+    donation.date = this.formatDateForMySQL(donation.date);
+    console.log(donation);
+    return this.http.post('http://localhost:3000/donation',donation);
+  }
+  //format datetime
+  private formatDateForMySQL(isoDate: string): string {
+    return new Date(isoDate).toISOString().slice(0, 19).replace('T', ' ');
+  }
+
+  putFundraiser(fundraiser: any): Observable<any>{
+    return this.http.put(`http://localhost:3000/fundraiser/${fundraiser.FUNDRAISER_ID}`,fundraiser);
+  }
+
+  deleteFundraiser(fundraiser: any): Observable<any>{
+    return this.http.delete(`http://localhost:3000/fundraiser/${fundraiser.FUNDRAISER_ID}`);
+  }
+  
+  postFundraiser(fundraiser: any): Observable<any>{
+    return this.http.post('http://localhost:3000/add_fundraiser',fundraiser);
+  }
 }

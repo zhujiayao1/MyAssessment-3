@@ -1,9 +1,6 @@
-/*
- * @Descripttion: Web-A3
- * @Author: Zhujiayao & Luchenchen
- */
 import { Component } from '@angular/core';
 import { DataService } from '../services/data.service';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-search',
@@ -16,11 +13,13 @@ export class SearchComponent {
     organizer: '',
     city: '',
     categories: [],
-    selectedCategory: '' // 用于绑定选中的 category
+    selectedCategory: '' 
   };
   fundraisers: any[] = [];
   error: boolean = false;
-  categories: string[] = ['Medical', 'Education', 'Crisis Relief', 'Animal','Social Impact' ]; // 类别字典
+  categories: string[] = ['Medical', 'Education', 'Crisis Relief', 'Animal','Social Impact' ];// Categories dict
+  searchSuccessful: boolean = false;
+  
 
   // 构造函数中注入DataService
   constructor(private dataService: DataService) { }
@@ -35,13 +34,16 @@ export class SearchComponent {
       next: (data) => {
         this.fundraisers = data;
         this.error = this.fundraisers.length === 0;
+        this.searchSuccessful = true;
       },
       error: (error) => {
         console.error('Error fetching fundraisers:', error);
         this.error = true;
+        this.searchSuccessful = false;
       }
     });
   }
+
 
   clearCheckboxes() {
     this.criteria.organizer = '';

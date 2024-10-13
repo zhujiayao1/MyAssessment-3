@@ -3,7 +3,7 @@
  * @Author: Zhujiayao & Luchenchen
  */
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';//在路由中拿参数
+import { ActivatedRoute,Router } from '@angular/router';//在路由中拿参数
 import { DataService } from '../services/data.service';
 
 @Component({
@@ -26,7 +26,8 @@ export class FundraiserComponent implements OnInit{
   // 构造函数中注入DataService
   constructor(
     private route: ActivatedRoute,
-    private dataService: DataService
+    private dataService: DataService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -48,7 +49,7 @@ export class FundraiserComponent implements OnInit{
 
    // 捐赠按钮点击事件
    onDonate() {
-    alert('此功能正在建设中');
+    this.router.navigate(['/donation', this.fundraiserId]);
   }
 }
 

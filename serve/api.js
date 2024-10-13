@@ -38,6 +38,8 @@ app.use(express.json()); // 用于解析JSON格式的请求体
 // 使用中间件解析URL编码的请求体
 app.use(express.urlencoded({ extended: true }));
 
+
+//get active_fundraisers
 app.get('/fundraisers',function(req,res){
 	pool.getConnection(function(err,connection){
 		if (err) {
@@ -61,6 +63,29 @@ app.get('/fundraisers',function(req,res){
 	})
 })
 
+//get all_fundraisers
+app.get('/all_fundraisers',function(req,res){
+	pool.getConnection(function(err,connection){
+		if (err) {
+			res.send('Connection error')
+		}
+		console.log(connection)
+		const query = `
+		SELECT f.*, c.NAME AS category_name
+	   FROM fundraiser f
+	   JOIN category c ON f.CATEGORY_ID = c.CATEGORY_ID
+	   ORDER BY ACTIVE DESC;
+   `;
+		connection.query(query,function(err,results){
+			if (err) {
+				console.log(err)
+				res.send('Query failure')
+			}
+			res.send(results)
+			connection.release();
+		})
+	})
+})
 
 app.get('/search',function(req,res){
 	pool.getConnection(function(err,connection){
@@ -69,13 +94,13 @@ app.get('/search',function(req,res){
 		}
 		const organizer = req.query.organizer;
 		const city = req.query.city;
-		const categoryName = req.query.category;
+		const categoryName = req.query.category
 		let query = `
 		  SELECT *,name as CATEGORY_NAME 
 		  FROM fundraiser f 
 		  LEFT JOIN category c 
 		  ON f.CATEGORY_ID = c.CATEGORY_ID
-		  WHERE 
+		  WHERE f.ACTIVE = 1 and
 		`;
 
 		console.log(organizer,city,categoryName)
@@ -127,7 +152,7 @@ app.get('/fundraiser/:id', function (req, res) {
 		connection.query(query, [fundraiserId],function(err,results){
 			if (err) {
 				console.log(err)
-				res.send('Query failure')
+				res.send({msg:'Query failure'})
 			}
 			res.send(results[0])
 			connection.release();
@@ -140,12 +165,12 @@ app.post('/donation', function (req, res) {
 		if (err) {
 			res.send('Connection error')
 		}
-		const date = req.query.date
-		const amount = req.query.amount
-		const giver = req.query.giver
-		const fundraiserId = req.query.fundraiserId
+		const date = req.body.date
+		const amount = req.body.amount
+		const giver = req.body.giver
+		const fundraiserId = req.body.fundraiserId
 
-		console.log(date, amount, giver, fundraiserId);//测试拿到的参数
+		console.log(date, amount, giver, fundraiserId);//测试拿到参数
 
 		if (!date || !amount || !giver || !fundraiserId) {
             // 如果数据不完整，返回400错误
@@ -157,9 +182,9 @@ app.post('/donation', function (req, res) {
 		connection.query(query, [date, amount, giver, fundraiserId],function(err,results){
 			if (err) {
 				console.log(err)
-				res.send('Query failure')
+				res.send(JSON.stringify({ message: 'Query failure'}))
 			}
-			res.send("donation insert success")
+			res.send(JSON.stringify({ message: 'donation insert success' }))
 			connection.release();
 		})
 	})
@@ -170,13 +195,15 @@ app.post('/add_fundraiser', function (req, res) {
 		if (err) {
 			res.send('Connection error')
 		}
-		const organizer = req.query.organizer
-		const caption = req.query.caption
-		const targetFunding = req.query.target_funding
-		const currentFunding = req.query.current_funding
-		const city = req.query.city
-		const active = req.query.active
-		const categoryID = req.query.category_id
+		// 从请求包中获取参数
+		const fundraiserId = req.body.FUNDRAISER_ID; 
+		const organizer = req.body.ORGANIZER
+		const caption = req.body.CAPTION
+		const targetFunding = req.body.TARGET_FUNDING
+		const currentFunding = req.body.CURRENT_FUNDING
+		const city = req.body.CITY
+		const active = req.body.ACTIVE
+		const categoryID = req.body.Category
 
 		console.log(targetFunding,currentFunding);//测试拿到参数
 		if (!organizer || !caption || !targetFunding || !currentFunding 
@@ -203,7 +230,7 @@ app.post('/add_fundraiser', function (req, res) {
 				console.log(err)
 				res.send('Query failure')
 			}
-			res.send("fundraiser insert success")
+			res.send(JSON.stringify({ message: 'fundraiser add success' }))
 			connection.release();
 		})
 	})
@@ -216,14 +243,15 @@ app.put('/fundraiser/:id', function (req, res) {
 		if (err) {
 			res.send('Connection error')
 		}
-		const fundraiserId = req.params.id; // 从请求参数中获取筹款人的 ID
-		const organizer = req.query.organizer
-		const caption = req.query.caption
-		const targetFunding = req.query.target_funding
-		const currentFunding = req.query.current_funding
-		const city = req.query.city
-		const active = req.query.active
-		const categoryID = req.query.category_id
+		// 从请求包中获取参数
+		const fundraiserId = req.body.FUNDRAISER_ID; 
+		const organizer = req.body.ORGANIZER
+		const caption = req.body.CAPTION
+		const targetFunding = req.body.TARGET_FUNDING
+		const currentFunding = req.body.CURRENT_FUNDING
+		const city = req.body.CITY
+		const active = req.body.ACTIVE
+		const categoryID = req.body.CATEGORY_ID
 
 		console.log(fundraiserId+"\n",req.query);//测试拿到参数
 		if (!organizer || !caption || !targetFunding || !currentFunding 
@@ -252,7 +280,7 @@ app.put('/fundraiser/:id', function (req, res) {
 				console.log(err)
 				res.send('Query failure')
 			}
-			res.send("fundraiser update success")
+			res.send(JSON.stringify({ message: 'fundraiser update success' }))
 			connection.release();
 		})
 	})
@@ -284,31 +312,17 @@ app.delete('/fundraiser/:id', function (req, res) {
 					res.send('Query failure')
 				}
 				// 删除成功
-				res.send("fundraiser delete success")
+				res.send(JSON.stringify({ message: 'fundraiser delete success' }))
 				connection.release();
 			})
 
 		});	
 		
 	})
-})
+});
 
-;
-
-
-// Err exec
 app.use((err, req, res, next) => {
 	console.error(err.stack);
 	res.status(500).send('ERR!');
   });
   
-  // Close db
-//   process.on('SIGINT', () => {
-// 	connection.end(err => {
-// 	  if (err) console.error('Error closing the connection:', err.stack);
-// 	  console.log('Closed the database connection.');
-// 	  process.exit();
-// 	});
-//   });
-  
-// module.exports = router;

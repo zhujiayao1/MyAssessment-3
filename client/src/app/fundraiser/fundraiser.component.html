@@ -2,7 +2,7 @@
     <h2>Active Fundraisers</h2>
   <section class="active-fundraisers">
     
-    <div *ngFor="let fundraiser of fundraisers">
+    <div >
       <h3>{{ fundraiser.CAPTION }}</h3>
       <img src="assets/picture11.jpg">
       <p>Organiser: {{ fundraiser.ORGANIZER }}</p>
@@ -11,8 +11,10 @@
       <p>City: {{ fundraiser.CITY }}</p>
       <p>Category: {{ fundraiser.category_name }}</p>
      
-      <img *ngIf="fundraiser.imageUrl" [src]="fundraiser.imageUrl" alt="Fundraiser Image">
+      <!-- <img *ngIf="fundraiser.imageUrl" [src]="fundraiser.imageUrl" alt="Fundraiser Image"> -->
     </div>
+    <!-- 捐赠按钮 -->
+  <button (click)="onDonate()">捐赠</button>
   </section>
   
   <section>

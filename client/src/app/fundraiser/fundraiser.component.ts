@@ -13,7 +13,14 @@ import { DataService } from '../services/data.service';
 })
 export class FundraiserComponent implements OnInit{
 
-  fundraisers:any;
+  fundraiser = {
+    CAPTION: '',
+    ORGANIZER: '',
+    TARGET_FUNDING: 0,
+    CURRENT_FUNDING: 0,
+    CITY: '',
+    category_name: ''
+  };;
   fundraiserId: any='';
   
   // 构造函数中注入DataService
@@ -24,19 +31,21 @@ export class FundraiserComponent implements OnInit{
 
   ngOnInit() {
     // 从查询参数中获取筹款活动ID
-    this.fundraiserId = this.route.snapshot.queryParamMap.get('id');
+    this.fundraiserId = this.route.snapshot.paramMap.get('id');
+    console.log("fundraiser ts fid:", this.fundraiserId);
     // 获取筹款活动详情
     this.dataService.getFundraiser(this.fundraiserId).subscribe(
       (fundraiser) => {
         // 当数据成功返回时，将其赋值给data属性
-        this.fundraisers= fundraiser;
+        this.fundraiser= fundraiser;
+        // console.log(this.fundraiser)
       },
       (error) => {
         // 处理错误情况
         console.error('Error fetching data: ', error);
     });
   }
-  
+
    // 捐赠按钮点击事件
    onDonate() {
     alert('此功能正在建设中');

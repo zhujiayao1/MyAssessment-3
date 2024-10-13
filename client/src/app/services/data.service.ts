@@ -22,6 +22,7 @@ export class DataService {
 
   searchFundraisers(criteria: any): Observable<any[]> {
     const params = this.serializeCriteria(criteria);
+    console.log(params)
     // 反引号构建url
     return this.http.get<any[]>(`http://localhost:3000/search?${params}`);
   }
